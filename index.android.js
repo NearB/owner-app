@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import React, { Component } from 'react';
 import {
   AppRegistry,
@@ -30,8 +29,6 @@ class App extends Component {
 
   renderScene(route, navigator) {
     var routeId = route.id;
-    // console.log("ROUTE");
-    // console.log(route);
 
     if (routeId === 'AccessPointList') {
       return (
@@ -62,22 +59,6 @@ class App extends Component {
 }
 
 var styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
 });
 
 AppRegistry.registerComponent('OwnerApp', () => App);

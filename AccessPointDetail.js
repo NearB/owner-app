@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   AppRegistry,
   StyleSheet,
@@ -10,11 +10,14 @@ import {
   Navigator,
   NativeModules
 } from 'react-native';
-import _ from 'underscore'
+
+import ActionButton from 'react-native-action-button';
+import IoIcons from 'react-native-vector-icons/Ionicons';
+import FaIcon from 'react-native-vector-icons/FontAwesome';
 
 class AccessPointDetail extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       ap: props.accessPoint,
@@ -22,17 +25,13 @@ class AccessPointDetail extends Component {
         LeftButton(route, navigator, index, navState) {
           return (
             <TouchableOpacity style={{flex: 1, justifyContent: 'center'}}
-              onPress={() => navigator.parentNavigator.pop()}>
-            <Image
-              style={styles.resizeMode}
-              resizeMode={Image.resizeMode.contain}
-              source={require('./back-arrow.png')}
-            />
+                              onPress={() => navigator.parentNavigator.pop()}>
+              <IoIcons name="md-arrow-back" style={{fontSize: 40}}/>
             </TouchableOpacity>
           );
         },
 
-        RightButton(route, navigator, index, navState) { return null;},
+        RightButton(route, navigator, index, navState) { return null; },
 
         Title(route, navigator, index, navState) {
           return (
@@ -50,14 +49,15 @@ class AccessPointDetail extends Component {
   render() {
     return (
       <Navigator
-      renderScene={this.renderScene.bind(this)}
-      navigator={this.props.navigator}
-      navigationBar={
+        renderScene={this.renderScene.bind(this)}
+        navigator={this.props.navigator}
+        navigationBar={
         <Navigator.NavigationBar style={{backgroundColor: '#246dd5'}}
           routeMapper={this.state.navBar} />
-      } />
+      }/>
     );
   }
+
   renderScene(route, navigator) {
     return (
       <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
@@ -65,14 +65,18 @@ class AccessPointDetail extends Component {
           <Text style={styles.title}>SSID: {this.state.ap.SSID}</Text>
           <Text style={styles.title}>Level: {this.state.ap.level}</Text>
           <Text style={styles.data}>{this.state.ap.BSSID}</Text>
+          // <FaIcon.Button name="facebook" backgroundColor="#3b5998" onPress={this.loginWithFacebook}>
+          //   Login with Facebook
+          // </FaIcon.Button>
         </TouchableOpacity>
       </View>
     );
   }
+
   gotoNext() {
     this.props.navigator.push({
       id: 'NoNavigatorPage',
-      sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
+      sceneConfig: Navigator.SceneConfigs.FloatFromBottom
     });
   }
 }
@@ -82,17 +86,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#F5FCFF'
   },
   welcome: {
     fontSize: 20,
     textAlign: 'center',
-    margin: 10,
+    margin: 10
   },
   instructions: {
     textAlign: 'center',
     color: '#333333',
-    marginBottom: 5,
+    marginBottom: 5
   },
   title: {
     fontSize: 20,
