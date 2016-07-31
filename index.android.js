@@ -1,49 +1,59 @@
-import _ from 'underscore';
 import React, { Component } from 'react';
 import {
   AppRegistry,
-  StyleSheet,
   Text,
   View,
-  ListView,
-  Navigator,TouchableOpacity, TouchableHighlight,
-  NativeModules
+  Navigator,
+  StyleSheet,
+  TouchableOpacity,
+  BackAndroid
 } from 'react-native';
 
-var AccessPointDetail = require('./AccessPointDetail');
-var AccessPointList = require('./AccessPointList');
+import RegistrationDetail from './component/RegistrationDetail';
+import HomeView from './component/HomeView';
+
+var _navigator; // we fill this up upon on first navigation.
+
+BackAndroid.addEventListener('hardwareBackPress', () => {
+  if (_navigator.getCurrentRoutes().length === 1  ) {
+    return false;
+  }
+  _navigator.pop();
+  return true;
+});
 
 class App extends Component {
+
   render() {
     return (
       <Navigator
-          initialRoute={{id: 'AccessPointList', name: 'List'}}
+          initialRoute={{id: 'HomeView', name: 'List'}}
           renderScene={this.renderScene.bind(this)}
           configureScene={(route) => {
             if (route.sceneConfig) {
               return route.sceneConfig;
             }
             return Navigator.SceneConfigs.FloatFromRight;
-          }} />
+          }}
+      />
     );
   }
 
   renderScene(route, navigator) {
     var routeId = route.id;
-    // console.log("ROUTE");
-    // console.log(route);
+    _navigator = navigator;
 
-    if (routeId === 'AccessPointList') {
+    if (routeId === 'HomeView') {
       return (
-        <AccessPointList
+        <HomeView
           navigator={navigator}/>
       );
     }
-    if (routeId === 'AccessPointDetail') {
+    if (routeId === 'RegistrationDetail') {
       return (
-        <AccessPointDetail
+        <RegistrationDetail
           navigator={navigator}
-          accessPoint={route.accessPoint} />
+          location={route.location} />
       );
     }
     return this.noRoute(navigator);
@@ -60,24 +70,5 @@ class App extends Component {
     );
   }
 }
-
-var styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
 
 AppRegistry.registerComponent('OwnerApp', () => App);

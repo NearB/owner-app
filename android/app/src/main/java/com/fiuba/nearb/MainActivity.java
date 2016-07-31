@@ -1,6 +1,9 @@
 package com.fiuba.nearb;
 
 import com.facebook.react.ReactActivity;
+import com.react.rnspinkit.RNSpinkitPackage;
+import com.github.xinthink.rnmk.ReactMaterialKitPackage;
+import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 
@@ -37,7 +40,10 @@ public class MainActivity extends ReactActivity {
     protected List<ReactPackage> getPackages() {
         return Arrays.<ReactPackage>asList(
             new WifiManager(),
-            new MainReactPackage()
+            new MainReactPackage(),
+            new RNSpinkitPackage(),
+            new ReactMaterialKitPackage(),
+            new VectorIconsPackage()
         );
     }
 }
