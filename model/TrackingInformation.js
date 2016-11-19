@@ -7,6 +7,10 @@ export class FingerPrint {
     this.rssi = rssi;
   }
 
+  toString(){
+    return `${this.mac=this.rssi}`;
+  }
+
   toJSON() {
     return {
       mac: this.mac,
@@ -23,6 +27,13 @@ export class TrackingInformation {
     this.location = place;
     this.time = time;
     this.wifiFingerprint = fingerprints;
+
+    this.fingerprints.bind(this);
+    this.toJSON.bind(this);
+  }
+
+  fingerprints(){
+    return this.wifiFingerprint.map(f => f.toString());
   }
 
   toJSON() {
@@ -35,4 +46,3 @@ export class TrackingInformation {
     };
   }
 }
-

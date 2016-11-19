@@ -10,21 +10,20 @@ import WifiClient from '../utils/WifiClient';
 import MobileClient from '../utils/MobileClient';
 const service = new MobileClient();
 
-
-export default class WifiLearning extends Component {
+export default class WifiTrack extends Component {
 
   constructor(props) {
     super(props);
 
-    this.wifi = new WifiClient('NearB', props.username);
+    this.wifi = new WifiClient('NearB', 'alem');
     this.numberOfScans = 0;
-    this.maxScans = 10;
+    this.maxScans = 1;
     this.scanJob = null;
     this.locationName = props.location;
-
     this.state = {
       locationInfo: null,
-      learning: true,
+      trackResult: null,
+      tracking: true,
       onCancel: props.onCancel,
       onDone: props.onDone
     };
@@ -45,20 +44,21 @@ export default class WifiLearning extends Component {
 
   done() {
     console.log("DONE");
+    console.log(this.state.trackResult);
     this._stopScanJob();
-    this.state.onDone();
+    this.state.onDone(this.state.trackResult);
   }
 
   _stopScanJob() {
     this.numberOfScans = 0;
-    this.setState({learning: false});
+    this.setState({tracking: false});
     clearInterval(this.scanJob);
   }
 
   startScan() {
     console.log("Starting scan");
     this.scanJob = setInterval(() => {
-      if (!this.state.learning) {
+      if (!this.state.tracking) {
         return;
       }
 
@@ -86,21 +86,16 @@ export default class WifiLearning extends Component {
   registerAp() {
     console.log(this.state.locationInfo.toJSON());
 
-    // //FIXME find a better way to handle this instead of hardcoded the IP of our docker server
-    fetch(`http://192.168.0.103:11019/learn`, {
-        json: true,
-        method: 'POST',
-        body: JSON.stringify(this.state.locationInfo.toJSON())
-      }
-    )
-    // service.locations('PUT','', {
-    //   body: JSON.stringify(this.state.locationInfo.toJSON())
-    // })
-    // .then((res) => {
-    //   console.log(res.data);
-    // }).catch((error) => {
-    //   console.log(error);
-    // });
+    const qparams = encodeURI(this.state.locationInfo.fingerprints().join(','));
+    console.log(qparams);
+
+    service.locate('GET', `?beacons=${qparams}`, {})
+    .then(res => {
+      console.log(res.data);
+      this.setState({trackResult: res.data});
+    }).catch((error) => {
+      console.log(error);
+    });
   }
 
   render() {
@@ -113,7 +108,6 @@ export default class WifiLearning extends Component {
       </View>
     );
   }
-
 }
 
 const styles = StyleSheet.create({
@@ -130,5 +124,4 @@ const styles = StyleSheet.create({
   }
 });
 
-
-module.exports = WifiLearning;
+module.exports = WifiTrack;

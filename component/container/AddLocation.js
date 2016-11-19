@@ -13,39 +13,22 @@ import _s from 'underscore.string';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-export default class HomeView extends Component {
+var _navigator;
+
+export default class AddLocation extends Component {
 
   constructor(props) {
     super(props);
-    this.locationName = '';
 
+    this.username = props.username;
+    console.log(this.username);
+    this.locationName = '';
     this.state = {
       disableRegister: true,
       iconStyle: styles.disabledNext
     };
     this.updateLocation = this.updateLocation.bind(this);
     this.gotoNext = this.gotoNext.bind(this);
-  }
-
-  render() {
-    return (
-      <Navigator
-        renderScene={this.renderScene.bind(this)}
-        navigationBar={
-          <Navigator.NavigationBar
-            routeMapper={{
-              LeftButton: (route, navigator, index, navState) =>
-              { return null; },
-              RightButton: (route, navigator, index, navState) =>
-              { return null; },
-              Title: (route, navigator, index, navState) =>
-              { return (<Text style={styles.barTitle}>Location Registration</Text>); },
-            }}
-            style={{backgroundColor: '#FA8428'}}
-          />
-        }
-      />
-    );
   }
 
   updateLocation(location) {
@@ -60,7 +43,8 @@ export default class HomeView extends Component {
   }
 
   renderScene(route, navigator) {
-    console.log('enabled ' + this.state.disableRegister);
+    _navigator = navigator;
+
     return (
       <KeyboardAwareScrollView contentContainerStyle={styles.container}>
         <View style={styles.container}>
@@ -77,6 +61,37 @@ export default class HomeView extends Component {
     );
   }
 
+  render() {
+    return (
+      <Navigator
+        renderScene={this.renderScene.bind(this)}
+        navigationBar={
+          <Navigator.NavigationBar
+            routeMapper={{
+              LeftButton: (route, navigator, index, navState) =>
+              { return (
+                  <Icon name="arrow-circle-left"
+                    allowFontScaling={true}
+                    onPress={()=>{
+                      if (_navigator.getCurrentRoutes().length >= 1  ) {
+                        _navigator.pop();
+                      }
+                    }}
+                  />
+                );
+              },
+              RightButton: (route, navigator, index, navState) =>
+              { return null; },
+              Title: (route, navigator, index, navState) =>
+              { return (<Text style={styles.barTitle}>Location Registration</Text>); },
+            }}
+            style={{backgroundColor: '#FA8428'}}
+          />
+        }
+      />
+    );
+  }
+
   _next() {
     if (!this.state.disableRegister) {
       this.gotoNext();
@@ -87,7 +102,8 @@ export default class HomeView extends Component {
     this.props.navigator.push({
       id: 'RegistrationDetail',
       name: 'RegistrationDetail',
-      location: this.locationName
+      location: this.locationName,
+      username: this.username
     });
   }
 }
@@ -125,4 +141,4 @@ const styles = StyleSheet.create({
   }
 });
 
-module.exports = HomeView;
+module.exports = AddLocation;
