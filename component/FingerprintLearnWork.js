@@ -87,20 +87,20 @@ export default class WifiLearning extends Component {
     console.log(this.state.locationInfo.toJSON());
 
     // //FIXME find a better way to handle this instead of hardcoded the IP of our docker server
-    fetch(`http://192.168.0.103:11019/learn`, {
-        json: true,
-        method: 'POST',
-        body: JSON.stringify(this.state.locationInfo.toJSON())
-      }
-    )
-    // service.locations('PUT','', {
-    //   body: JSON.stringify(this.state.locationInfo.toJSON())
-    // })
-    // .then((res) => {
-    //   console.log(res.data);
-    // }).catch((error) => {
-    //   console.log(error);
-    // });
+    // fetch(`http://192.168.0.103:11019/learn`, {
+    //     json: true,
+    //     method: 'POST',
+    //     body: JSON.stringify(this.state.locationInfo.toJSON())
+    //   }
+    // )
+    service.locations('PUT','', {
+      body: JSON.stringify(this.state.locationInfo.toJSON())
+    })
+    .then((res) => {
+      console.log(res.data);
+    }).catch((error) => {
+      console.log(error);
+    });
   }
 
   render() {

@@ -8,13 +8,13 @@ export class FingerPrint {
   }
 
   toString(){
-    return `${this.mac=this.rssi}`;
+    return `${this.mac}=${this.rssi}`;
   }
 
   toJSON() {
     return {
       mac: this.mac,
-      rssi: this.rssi
+      rssi: Number(this.rssi)
     };
   }
 }
@@ -38,11 +38,11 @@ export class TrackingInformation {
 
   toJSON() {
     return {
-      'group': this.group,
-      'username': this.username,
-      'location': this.location,
-      'time': this.time,
-      'wifi-fingerprint': this.wifiFingerprint
+      group: this.group,
+      username: this.username,
+      location: this.location,
+      time: this.time,
+      "wifi-fingerprint": this.wifiFingerprint
     };
   }
 }

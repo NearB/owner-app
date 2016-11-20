@@ -115,7 +115,8 @@ export default class RegistrationDetail extends Component {
     return (
       <WifiTrack onCancel={this.cancelTracking.bind(this)}
                     onDone={this.doneTracking.bind(this)}
-                    location={this.state.location}/>
+                    location={this.state.location}
+                    username={this.username}/>
     );
   }
 

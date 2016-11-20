@@ -47,7 +47,7 @@ export default class UserHome extends Component {
   }
 
   _fetchStores() {
-    service.stores('GET')
+    service.stores('GET', '')
     .then((res) => {
       const data = res.data;
       console.log(data);

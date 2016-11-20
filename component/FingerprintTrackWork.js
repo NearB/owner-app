@@ -20,6 +20,8 @@ export default class WifiTrack extends Component {
     this.maxScans = 1;
     this.scanJob = null;
     this.locationName = props.location;
+    this.username = props.username;
+
     this.state = {
       locationInfo: null,
       trackResult: null,
@@ -89,7 +91,7 @@ export default class WifiTrack extends Component {
     const qparams = encodeURI(this.state.locationInfo.fingerprints().join(','));
     console.log(qparams);
 
-    service.locate('GET', `?beacons=${qparams}`, {})
+    service.locate('GET', `?beacons=${qparams}&username=${this.username}`, {})
     .then(res => {
       console.log(res.data);
       this.setState({trackResult: res.data});
