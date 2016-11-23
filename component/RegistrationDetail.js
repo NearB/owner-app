@@ -13,9 +13,11 @@ import {
 
 import {Button} from 'react-native-material-design';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import WifiLearning from './FingerprintLearnWork';
-import WifiTrack from './FingerprintTrackWork';
+import WifiLearning from './WifiLearning';
+import WifiTrack from './WifiTrack';
 import WifiClient from '../utils/WifiClient';
+
+const STORES_GROUP = 'Stores';
 
 var _navigator;
 
@@ -24,11 +26,12 @@ export default class RegistrationDetail extends Component {
   constructor(props) {
     super(props);
     this.username = props.username;
+    this.storeName = props.storeName;
+    this.location = props.location;
 
-    this.wifi = new WifiClient('OwnerApp', this.username);
+    this.wifi = new WifiClient(STORES_GROUP, `${this.username}:${this.storeName}`);
 
     this.state = {
-      location: props.location,
       track: null,
       learning: false,
       tracking: false,
@@ -53,7 +56,21 @@ export default class RegistrationDetail extends Component {
     this.setState({learning: false});
   }
 
-  done() {
+  done(locationInfo) {
+
+    console.log(locationInfo.toJSON());
+
+    const qparams = encodeURI(locationInfo.fingerprints().join(','));
+    const user = encodeURI(`${this.username}:${this.storeName}`);
+    console.log(qparams);
+
+    service.locate('GET', `?beacons=${qparams}&username=${user}`, {})
+    .then(res => {
+      console.log(res.data);
+    }).catch((error) => {
+      console.log(error);
+    });
+
     this.setState({learning: false});
   }
 
@@ -106,16 +123,18 @@ export default class RegistrationDetail extends Component {
     return (
       <WifiLearning onCancel={this.cancelLearn.bind(this)}
                     onDone={this.done.bind(this)}
-                    location={this.state.location}
+                    location={this.location}
                     username={this.username}/>
     );
   }
 
   renderTracking() {
+    // <Button value="NORMAL RAISED" raised={true} onPress={this.track.bind(this)}
+    //         text='Track Current Location' theme='light'/>
     return (
       <WifiTrack onCancel={this.cancelTracking.bind(this)}
                     onDone={this.doneTracking.bind(this)}
-                    location={this.state.location}
+                    location={this.location}
                     username={this.username}/>
     );
   }
@@ -123,7 +142,7 @@ export default class RegistrationDetail extends Component {
   renderInfo() {
     return (
       <View>
-        <Text style={styles.locationName}>{this.state.location}</Text>
+        <Text style={styles.locationName}>{this.location}</Text>
         <View style={styles.apInfo}>
           <Icon name="wifi" size={this.state.closestAp.height} style={{marginBottom: 10}}/>
           <Text style={styles.data}>{this.state.closestAp}</Text>
@@ -131,9 +150,6 @@ export default class RegistrationDetail extends Component {
 
         <Button value="NORMAL RAISED" raised={true} onPress={this.learn.bind(this)}
                 text='Register Access Point' theme='light'/>
-
-        <Button value="NORMAL RAISED" raised={true} onPress={this.track.bind(this)}
-                text='Track Current Location' theme='light'/>
       </View>
     );
   }
@@ -148,14 +164,21 @@ export default class RegistrationDetail extends Component {
             routeMapper={{
               LeftButton: (route, navigator, index, navState) =>
               { return (
-                  <Icon name="sign-out"
-                    allowFontScaling={true}
-                    onPress={()=>{
-                      if (_navigator.getCurrentRoutes().length >= 1  ) {
-                        _navigator.pop();
-                      }
-                    }}
-                  />
+                <View>
+                  <TouchableOpacity
+                    onPress={()=>{ this.props.navigator.pop();}}>
+                    <Icon name="arrow-left"
+                      style={{
+                        fontSize: 30,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        color:'#FFFFFF',
+                        marginTop: 12,
+                        marginLeft: 12
+                      }}
+                      allowFontScaling={true}/>
+                  </TouchableOpacity>
+                </View>
                 );
               },
               RightButton: (route, navigator, index, navState) => {

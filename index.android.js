@@ -94,6 +94,7 @@ class App extends Component {
       return (
         <AddLocation
           navigator={navigator}
+          storeName={route.storeName}
           username={route.username}/>
       );
     }

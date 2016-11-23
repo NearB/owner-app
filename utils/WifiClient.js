@@ -9,15 +9,15 @@ const WifiManager = NativeModules.WifiManager;
 
 export default class WifiClient {
 
-  constructor(store, owner) {
-    this.store = store;
-    this.owner = owner;
+  constructor(group, user) {
+    this.group = group;
+    this.user = user;
   }
 
   getLocationInfo(location) {
     return new Promise((success, err) => {
       this._getScanResults((apData, fingerprints) => {
-        success(new TrackingInformation(this.store, this.owner, location, Date.now(), fingerprints));
+        success(new TrackingInformation(this.group, this.user, location, Date.now(), fingerprints));
       }, err);
     });
   }
@@ -28,7 +28,7 @@ export default class WifiClient {
         success({
           name: _s.humanize(apData[0].SSID),
           SSID: apData[0].SSID,
-          trackingInfo: new TrackingInformation(this.store, this.owner, _s.humanize(apData[0].SSID), Date.now(), fingerprints)
+          trackingInfo: new TrackingInformation(this.group, this.user, _s.humanize(apData[0].SSID), Date.now(), fingerprints)
         });
       }, err);
     });
@@ -42,7 +42,7 @@ export default class WifiClient {
           return {
             name: _s.humanize(ap.SSID),
             SSID: ap.SSID,
-            trackingInfo: new TrackingInformation(this.store, this.owner, _s.humanize(ap.SSID), Date.now(), fingerprints)
+            trackingInfo: new TrackingInformation(this.group, this.user, _s.humanize(ap.SSID), Date.now(), fingerprints)
           };
         });
 

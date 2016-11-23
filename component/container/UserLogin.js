@@ -52,10 +52,6 @@ export default class UserLogin extends Component {
   }
 
   handleSubmit() {
-
-    console.log("USER: "+this.user);
-    console.log("PASS: "+this.pass);
-
     service.users('GET', this.user)
     .then(res => {
       if (res.data != null) {

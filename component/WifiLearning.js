@@ -10,17 +10,20 @@ import WifiClient from '../utils/WifiClient';
 import MobileClient from '../utils/MobileClient';
 const service = new MobileClient();
 
+const STORES_GROUP = 'Stores';
 
 export default class WifiLearning extends Component {
 
   constructor(props) {
     super(props);
 
-    this.wifi = new WifiClient('NearB', props.username);
+    this.username = `${props.username}:${props.storeName}`;
+    this.locationName = `${props.storeName}:${props.location}`;
+
+    this.wifi = new WifiClient(STORES_GROUP, );
     this.numberOfScans = 0;
     this.maxScans = 10;
     this.scanJob = null;
-    this.locationName = props.location;
 
     this.state = {
       locationInfo: null,
@@ -46,7 +49,7 @@ export default class WifiLearning extends Component {
   done() {
     console.log("DONE");
     this._stopScanJob();
-    this.state.onDone();
+    this.state.onDone(this.locationInfo);
   }
 
   _stopScanJob() {
@@ -86,13 +89,6 @@ export default class WifiLearning extends Component {
   registerAp() {
     console.log(this.state.locationInfo.toJSON());
 
-    // //FIXME find a better way to handle this instead of hardcoded the IP of our docker server
-    // fetch(`http://192.168.0.103:11019/learn`, {
-    //     json: true,
-    //     method: 'POST',
-    //     body: JSON.stringify(this.state.locationInfo.toJSON())
-    //   }
-    // )
     service.locations('PUT','', {
       body: JSON.stringify(this.state.locationInfo.toJSON())
     })

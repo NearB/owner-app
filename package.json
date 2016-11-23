@@ -15,7 +15,7 @@
     "react-native-material-design": "^0.3.6",
     "react-native-material-kit": "^0.3.2",
     "react-native-spinkit": "^0.1.2",
-    "react-native-vector-icons": "^2.0.3",
+    "react-native-vector-icons": "^3.0.0",
     "underscore": "^1.8.3",
     "underscore.string": "^3.3.4"
   }

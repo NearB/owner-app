@@ -6,21 +6,23 @@ import {Button} from 'react-native-material-design';
 import {MKSpinner} from 'react-native-material-kit';
 
 import WifiClient from '../utils/WifiClient';
-
 import MobileClient from '../utils/MobileClient';
 const service = new MobileClient();
+
+const STORES_GROUP = 'Stores';
 
 export default class WifiTrack extends Component {
 
   constructor(props) {
     super(props);
 
-    this.wifi = new WifiClient('NearB', 'alem');
+    this.username = `${props.username}:${props.storeName}`;
+    this.locationName = `${props.storeName}:${props.location}`;
+
+    this.wifi = new WifiClient(STORES_GROUP, this.username);
     this.numberOfScans = 0;
     this.maxScans = 1;
     this.scanJob = null;
-    this.locationName = props.location;
-    this.username = props.username;
 
     this.state = {
       locationInfo: null,
@@ -35,7 +37,6 @@ export default class WifiTrack extends Component {
     this.cancel = this.cancel.bind(this);
     this.done = this.done.bind(this);
     this._stopScanJob = this._stopScanJob.bind(this);
-
   }
 
   cancel() {

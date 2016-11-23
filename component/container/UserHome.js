@@ -28,12 +28,10 @@ export default class UserHome extends Component {
   constructor(props) {
     super(props);
 
-    this.selected = null;
     this.username = props.username;
     this.ownerId= props.userId;
     this.state = {
-      stores: ds.cloneWithRows([]),
-      addingStore: false
+      stores: ds.cloneWithRows([])
     };
 
     this._fetchStores = this._fetchStores.bind(this);
@@ -51,7 +49,9 @@ export default class UserHome extends Component {
     .then((res) => {
       const data = res.data;
       console.log(data);
-      this.setState({stores: ds.cloneWithRows(data)})
+      this.setState({
+        stores: ds.cloneWithRows(data)
+      });
     })
     .catch((error) => {
       console.log(error);
@@ -60,14 +60,11 @@ export default class UserHome extends Component {
 
   _selectStore(store){
     console.log(store);
-    this.selected = store;
-    this.setState({addingStore: false});
-    this._next();
+    this._next(false, store);
   }
 
   _addStore(){
-    this.setState({addingStore: true});
-    this._next();
+    this._next(true, null);
   }
 
   renderScene(route, navigator) {
@@ -76,19 +73,25 @@ export default class UserHome extends Component {
 
     return (
       <View style={styles.container}>
+        <Text style={{marginTop:40}}>SPACER</Text>
         <ListView
           dataSource={this.state.stores}
 
           renderRow={ (rowData) => {
-            return (<TouchableOpacity style={{height: 60}}
-              onPress={() => { this._selectStore(rowData);}}>
-              <Text style={{fontWeight: 'bold'}}>{rowData.name}</Text>
-              <Text>{rowData._id}</Text>
-            </TouchableOpacity>);
+            return (
+              <TouchableOpacity style={{margin:20}}
+                onPress={() => { this._selectStore(rowData);}}>
+                <View style={styles.apInfo}>
+                  <Image style={{width: 50, height: 50}}
+                    source={{uri: 'https://facebook.github.io/react/img/logo_og.png'}}/>
+                  <Text style={{marginLeft:15, fontSize: 15, fontWeight: 'bold'}}>{_s.humanize(rowData.name)}</Text>
+                </View>
+              </TouchableOpacity>
+            );
             }
           }
+          renderSeparator={(sectionId, rowId) => <View key={rowId} style={styles.separator} />}
         />
-
         <ActionButton
           position="right"
           buttonColor="#FA8428"
@@ -107,15 +110,21 @@ export default class UserHome extends Component {
             routeMapper={{
               LeftButton: (route, navigator, index, navState) =>
               { return (
-                  <Icon name="sign-out"
-                    style={{fontSize: 40, justifyContent: 'center', alignItems: 'center', marginTop: 10}}
-                    allowFontScaling={true}
-                    onPress={()=>{
-                      if (_navigator.getCurrentRoutes().length >= 1  ) {
-                        _navigator.pop();
-                      }
-                    }}
-                  />
+                <View>
+                  <TouchableOpacity
+                    onPress={()=>{ this.props.navigator.pop();}}>
+                    <Icon name="arrow-left"
+                      style={{
+                        fontSize: 30,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        color:'#FFFFFF',
+                        marginTop: 12,
+                        marginLeft: 12
+                      }}
+                      allowFontScaling={true}/>
+                  </TouchableOpacity>
+                </View>
                 );
               },
               RightButton: (route, navigator, index, navState) =>
@@ -135,18 +144,20 @@ export default class UserHome extends Component {
     );
   }
 
-  _next() {
-    if (this.state.addingStore){
+  _next(addingStore, selected) {
+    if (addingStore){
+      console.log("ADDING STORE");
       this.props.navigator.push({
         id: 'AddStore',
         name: 'AddStore',
-        ownerId: this.state.ownerId
+        ownerId: this.ownerId
       });
-    } else {
+    } else if (selected != null){
+      console.log("STORE DETAILS");
       this.props.navigator.push({
         id: 'StoreDetails',
         name: 'StoreDetails',
-        store: this.selected,
+        store: selected,
         ownerId: this.ownerId,
         username: this.username
       });
@@ -162,7 +173,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
   },
   barTitle: {
@@ -181,10 +192,21 @@ const styles = StyleSheet.create({
     fontSize: 50,
     marginTop: 10
   },
+  separator: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: '#8E8E8E',
+  },
   disabledNext: {
     color: '#808080',
     fontSize: 50,
     marginTop: 10
+  },
+  apInfo: {
+    flex: 0.2,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   }
 });
 

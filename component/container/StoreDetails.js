@@ -13,7 +13,7 @@ import {
 import {MKTextField, MKButton} from 'react-native-material-kit';
 import _s from 'underscore.string';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import {Button} from 'react-native-material-design';
 import ActionButton from 'react-native-action-button';
 
 import MobileClient from '../../utils/MobileClient';
@@ -32,7 +32,6 @@ export default class StoreDetails extends Component {
     this.ownerId = props.ownerId;
     this.store = props.store;
 
-    console.log(props.store);
     this.state = {
       locations: ds.cloneWithRows(this.store.locations),
       addingLocation: false
@@ -40,6 +39,7 @@ export default class StoreDetails extends Component {
 
     this._selectLocation = this._selectLocation.bind(this);
     this._addLocation = this._addLocation.bind(this);
+    this._editStore = this._editStore.bind(this);
   }
 
   _selectLocation(loc){
@@ -52,47 +52,54 @@ export default class StoreDetails extends Component {
     this._next();
   }
 
+  _editStore(){
+    this.setState({addingLocation: true});
+    this._next();
+  }
+
   renderScene(route, navigator) {
     _navigator = navigator;
 
     return (
       <View style={styles.container}>
-        <Text style={styles.locationName}>{this.store.name}</Text>
+        <Text style={{marginTop:40}}>SPACER</Text>
         <View style={styles.apInfo}>
-          <Icon name="home" size={20} style={{marginBottom: 10}}/>
+          <Icon name="user" size={20} style={{marginBottom: 10, marginRight: 10}}/>
+          <Text style={{fontSize: 15, fontWeight: 'bold', marginBottom: 10}}> Owner: </Text>
+          <Text style={styles.data}>{this.ownerId}</Text>
+        </View>
+        <View style={styles.apInfo}>
+          <Icon name="home" size={20} style={{marginBottom: 10, marginRight: 10}}/>
+          <Text style={{fontSize: 15, fontWeight: 'bold', marginBottom: 10}}> Address: </Text>
           <Text style={styles.data}>{this.store.address}</Text>
-        </View>
-        <View style={styles.apInfo}>
-          <Icon name="user" size={20} style={{marginBottom: 10}}/>
-          <Text style={styles.data}>{this.ownerId}</Text>
-        </View>
-        <MKButton
-          shadowRadius={2}
-          shadowOffset={{width:0, height:2}}
-          shadowOpacity={.7}
-          shadowColor="black"
-          onPress={this._addLocation}
-          >
-          <Text pointerEvents="none" style={{fontWeight: 'bold'}}>
-            Add Location
-          </Text>
-        </MKButton>
-        <View style={styles.apInfo}>
-          <Icon name="user" size={20} style={{marginBottom: 10}}/>
-          <Text style={styles.data}>{this.ownerId}</Text>
         </View>
         <ListView
           dataSource={this.state.locations}
-
+          initialListSize={this.store.locations.length}
           renderRow={ (rowData) => {
-            return (<TouchableOpacity style={{height: 30}}
+            return (<TouchableOpacity style={{height: 30, margin:20}}
               onPress={this._selectLocation}>
-              <Text style={{fontWeight: 'bold'}}>{rowData.split(':')[1]}</Text>
+              <View style={styles.apInfo}>
+                <Icon name='map-marker' size={20} style={{marginRight: 15}}/>
+                <Text style={{fontSize: 15, fontWeight: 'bold'}}>{_s.humanize(rowData.split(':')[1])}</Text>
+              </View>
             </TouchableOpacity>);
             }
           }
+          renderSeparator={(sectionId, rowId) => <View key={rowId} style={styles.separator} />}
         />
-
+        <ActionButton buttonColor="#FA8428" position="right">
+            <ActionButton.Item titleBgColor='#F5FCFF' buttonColor='#9b59b6'
+                textStyle={{fontSize: 15, fontWeight: 'bold'}}
+                onPress={this._addLocation}>
+              <Icon name="map-marker" style={styles.actionButtonIcon} />
+            </ActionButton.Item>
+            <ActionButton.Item titleBgColor='#F5FCFF' buttonColor='#3498db'
+              textStyle={{fontSize: 15, fontWeight: 'bold'}}
+              onPress={this._editStore}>
+              <Icon name="pencil" style={styles.actionButtonIcon} />
+            </ActionButton.Item>
+          </ActionButton>
       </View>
     );
   }
@@ -106,15 +113,21 @@ export default class StoreDetails extends Component {
             routeMapper={{
               LeftButton: (route, navigator, index, navState) =>
               { return (
-                  <Icon name="arrow-circle-left"
-                    style={{fontSize: 40, justifyContent: 'center', alignItems: 'center', marginTop: 10}}
-                    allowFontScaling={true}
-                    onPress={()=>{
-                      if (_navigator.getCurrentRoutes().length >= 1  ) {
-                        _navigator.pop();
-                      }
-                    }}
-                  />
+                <View>
+                  <TouchableOpacity
+                    onPress={()=>{ this.props.navigator.pop();}}>
+                    <Icon name="arrow-left"
+                      style={{
+                        fontSize: 30,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        color:'#FFFFFF',
+                        marginTop: 12,
+                        marginLeft: 12
+                      }}
+                      allowFontScaling={true}/>
+                  </TouchableOpacity>
+                </View>
                 );
               },
               RightButton: (route, navigator, index, navState) =>
@@ -122,7 +135,7 @@ export default class StoreDetails extends Component {
               Title: (route, navigator, index, navState) =>
               { return (
                   <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                    <Text style={styles.barTitle}>Store</Text>
+                    <Text style={styles.barTitle}>{this.store.name}</Text>
                   </View>
                 );
               },
@@ -145,7 +158,8 @@ export default class StoreDetails extends Component {
       this.props.navigator.push({
         id: 'AddLocation',
         name: 'AddLocation',
-        username: this.username
+        username: this.username,
+        storeName: this.store.name
       });
     } else {
       //TODO Edit store
@@ -156,7 +170,6 @@ export default class StoreDetails extends Component {
       //   ownerId: this.ownerId
       // });
     }
-
   }
 }
 
@@ -168,7 +181,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
   },
   barTitle: {
@@ -177,7 +190,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center',
     fontWeight: 'bold',
-    margin: 10,
+    marginLeft: 105,
+    marginTop: 12,
     color: 'white'
   },
   enabledNext: {
@@ -202,13 +216,23 @@ const styles = StyleSheet.create({
     color: '#656565',
     marginBottom: 10
   },
+  separator: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: '#8E8E8E',
+  },
   apInfo: {
     flex: 0.2,
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     margin: 10
-  }
+  },
+  actionButtonIcon: {
+    fontSize: 20,
+    height: 22,
+    color: 'white',
+  },
 });
 
 

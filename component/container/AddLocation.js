@@ -20,44 +20,53 @@ export default class AddLocation extends Component {
   constructor(props) {
     super(props);
 
+    this.storeName = props.storeName;
     this.username = props.username;
-    console.log(this.username);
     this.locationName = '';
     this.state = {
-      disableRegister: true,
-      iconStyle: styles.disabledNext
+      disableSubmit: true,
+      iconStyle: styles.enabledNext
     };
-    this.updateLocation = this.updateLocation.bind(this);
+    this._updateLocation = this._updateLocation.bind(this);
+    this._toogleSubmit = this._toogleSubmit.bind(this);
+    this._next = this._next.bind(this);
     this.gotoNext = this.gotoNext.bind(this);
   }
 
-  updateLocation(location) {
-    let disable = true;
-    let style = styles.disabledNext;
-    if (!_s.isBlank(location)) {
-      this.locationName = location;
-      disable = false;
-      style = styles.enabledNext;
+  _updateLocation(location) {
+    this.locationName = location;
+    this._toogleSubmit()
+  }
+
+  _toogleSubmit() {
+    const disable = _s.isBlank(this.locationName);
+    if (this.state.disableSubmit !== disable) {
+      this.setState({disableSubmit: disable})
     }
-    this.setState({disableRegister: disable, iconStyle: style});
   }
 
   renderScene(route, navigator) {
     _navigator = navigator;
 
     return (
-      <KeyboardAwareScrollView contentContainerStyle={styles.container}>
-        <View style={styles.container}>
+      <View style={styles.container}>
+        <View style={{flex: 1, flexDirection: 'column',   alignItems: 'center',
+          justifyContent: 'center',}}>
           <MKTextField placeholder='Where are you?'
                        style={styles.textfield}
                        underlineEnabled={true}
-                       onTextChange={this.updateLocation}
+                       onTextChange={this._updateLocation}
                        returnKeyType="next"
           />
-          <Icon name="arrow-circle-right" style={this.state.iconStyle} allowFontScaling={true}
-                onPress={this._next.bind(this)}/>
         </View>
-      </KeyboardAwareScrollView>
+        <View style={{flex: 0.5, flexDirection: 'column',   alignItems: 'flex-start',
+              justifyContent: 'center',}}>
+          {this.state.disableSubmit ? null
+            : <Icon name="arrow-circle-right" style={this.state.iconStyle}
+                allowFontScaling={true}
+                onPress={this._next}/>}
+        </View>
+      </View>
     );
   }
 
@@ -70,14 +79,21 @@ export default class AddLocation extends Component {
             routeMapper={{
               LeftButton: (route, navigator, index, navState) =>
               { return (
-                  <Icon name="arrow-circle-left"
-                    allowFontScaling={true}
-                    onPress={()=>{
-                      if (_navigator.getCurrentRoutes().length >= 1  ) {
-                        _navigator.pop();
-                      }
-                    }}
-                  />
+                <View>
+                  <TouchableOpacity
+                    onPress={()=>{ this.props.navigator.pop();}}>
+                    <Icon name="arrow-left"
+                      style={{
+                        fontSize: 30,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        color:'#FFFFFF',
+                        marginTop: 12,
+                        marginLeft: 12
+                      }}
+                      allowFontScaling={true}/>
+                  </TouchableOpacity>
+                </View>
                 );
               },
               RightButton: (route, navigator, index, navState) =>
@@ -93,7 +109,7 @@ export default class AddLocation extends Component {
   }
 
   _next() {
-    if (!this.state.disableRegister) {
+    if (!this.state.disableSubmit) {
       this.gotoNext();
     }
   }
@@ -103,6 +119,7 @@ export default class AddLocation extends Component {
       id: 'RegistrationDetail',
       name: 'RegistrationDetail',
       location: this.locationName,
+      storeName: this.storeName,
       username: this.username
     });
   }
@@ -126,7 +143,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center',
     fontWeight: 'bold',
-    margin: 10,
+    marginLeft: 30,
+    marginTop: 12,
     color: 'white'
   },
   enabledNext: {

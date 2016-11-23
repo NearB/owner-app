@@ -75,13 +75,13 @@ export default class AddStore extends Component {
         <View style={styles.container}>
           <View style={{flex: 1, flexDirection: 'column',   alignItems: 'center',
             justifyContent: 'center',}}>
-            <MKTextField placeholder='Username'
+            <MKTextField placeholder='Store Name'
                          style={styles.textfield}
                          underlineEnabled={true}
                          onTextChange={this.handleUserUpdate}
                          returnKeyType="next"
             />
-            <MKTextField placeholder='Password'
+          <MKTextField placeholder='Address'
                          style={styles.textfield}
                          underlineEnabled={true}
                          password={true}
@@ -109,14 +109,21 @@ export default class AddStore extends Component {
             routeMapper={{
               LeftButton: (route, navigator, index, navState) =>
               { return (
-                  <Icon name="arrow-circle-left"
-                    allowFontScaling={true}
-                    onPress={()=>{
-                      if (_navigator.getCurrentRoutes().length >= 1  ) {
-                        _navigator.pop();
-                      }
-                    }}
-                  />
+                <View>
+                  <TouchableOpacity
+                    onPress={()=>{ this.props.navigator.pop();}}>
+                    <Icon name="arrow-left"
+                      style={{
+                        fontSize: 30,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        color:'#FFFFFF',
+                        marginTop: 12,
+                        marginLeft: 12
+                      }}
+                      allowFontScaling={true}/>
+                  </TouchableOpacity>
+                </View>
                 );
               },
               RightButton: (route, navigator, index, navState) =>
@@ -166,11 +173,11 @@ const styles = StyleSheet.create({
   barTitle: {
     fontSize: 20,
     justifyContent: 'center',
-    flex: 1,
     textAlign: 'center',
     textAlignVertical: 'center',
     fontWeight: 'bold',
-    margin: 10,
+    marginLeft: 30,
+    marginTop: 12,
     color: 'white'
   },
   enabledNext: {
