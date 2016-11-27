@@ -12,24 +12,32 @@ import {MKTextField} from 'react-native-material-kit';
 import _s from 'underscore.string';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import NavLeft from '../common/NavigatorLeft';
 import MobileClient from '../../utils/MobileClient';
 const service = new MobileClient();
-
-var _navigator;
 
 export default class AddStore extends Component {
 
   constructor(props) {
     super(props);
+    this.userId = props.userId;
+    this.username = props.username;
+
+    if (this.username == null || this.userId == null){
+      throw new Error("LA CONCHA DE TU REPUTA MADRE");
+    }
+
+    console.log("username: " + this.username);
+    console.log("userId: " + this.userId);
+
     this.state = {
-      ownerId: props.ownerId,
       iconStyle: styles.enabledNext
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleNameUpdate = this.handleNameUpdate.bind(this);
-    this.handleAddressUpdate = this.handleAddressUpdate.bind(this);
     this._toogleSubmit = this._toogleSubmit.bind(this);
+    this._next = this._next.bind(this);
   }
 
   handleNameUpdate(name) {
@@ -37,13 +45,8 @@ export default class AddStore extends Component {
     this._toogleSubmit();
   }
 
-  handleAddressUpdate(address) {
-    this.address = address;
-    this._toogleSubmit();
-  }
-
   _toogleSubmit() {
-    const disable = _s.isBlank(this.user);
+    const disable = _s.isBlank(this.name);
     if (this.state.disableSubmit !== disable) {
       this.setState({disableSubmit: disable})
     }
@@ -51,26 +54,29 @@ export default class AddStore extends Component {
 
   handleSubmit() {
     service.stores('POST', '', {
-      name: this.name,
-      ownerId: this.state.ownerId,
-      stock: [],
-      locations: ['laBirreria:main'],
-      adIds: [],
-      campaignIds: [],
-      address: this.address
+      body: JSON.stringify({
+        name: this.name,
+        ownerId: this.userId,
+        stock: [],
+        locations: [],
+        adIds: [],
+        campaignIds: [],
+        address: ''
+      })
     })
     .then(res => {
+      console.log("RESPONSE");
       console.log(res.data);
-      _navigator.pop();
+      this.store = res.data;
+      this._next();
     })
     .catch(err => {
+      console.log("ERROR");
       console.log(err);
     });
   }
 
   renderScene(route, navigator) {
-    _navigator = navigator;
-
     return (
         <View style={styles.container}>
           <View style={{flex: 1, flexDirection: 'column',   alignItems: 'center',
@@ -78,14 +84,7 @@ export default class AddStore extends Component {
             <MKTextField placeholder='Store Name'
                          style={styles.textfield}
                          underlineEnabled={true}
-                         onTextChange={this.handleUserUpdate}
-                         returnKeyType="next"
-            />
-          <MKTextField placeholder='Address'
-                         style={styles.textfield}
-                         underlineEnabled={true}
-                         password={true}
-                         onTextChange={this.handlePasswordUpdate}
+                         onTextChange={this.handleNameUpdate}
                          returnKeyType="next"
             />
           </View>
@@ -100,6 +99,20 @@ export default class AddStore extends Component {
     );
   }
 
+  _next() {
+    if (!this.state.disableSubmit) {
+      const route = {
+        id: 'AddLocation',
+        name: 'AddLocation',
+        username: this.username,
+        store: this.store
+      };
+
+      console.log(route);
+      this.props.navigator.push(route);
+    }
+  }
+
   render() {
     return (
       <Navigator
@@ -109,21 +122,7 @@ export default class AddStore extends Component {
             routeMapper={{
               LeftButton: (route, navigator, index, navState) =>
               { return (
-                <View>
-                  <TouchableOpacity
-                    onPress={()=>{ this.props.navigator.pop();}}>
-                    <Icon name="arrow-left"
-                      style={{
-                        fontSize: 30,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        color:'#FFFFFF',
-                        marginTop: 12,
-                        marginLeft: 12
-                      }}
-                      allowFontScaling={true}/>
-                  </TouchableOpacity>
-                </View>
+                  <NavLeft onPress={()=>{ this.props.navigator.pop();}}/>
                 );
               },
               RightButton: (route, navigator, index, navState) =>
@@ -143,20 +142,6 @@ export default class AddStore extends Component {
     );
   }
 
-  _next() {
-    if (!this.state.disableSubmit) {
-      this.gotoNext();
-    }
-  }
-
-  gotoNext() {
-    this.props.navigator.push({
-      id: 'UserHome',
-      name: 'UserHome',
-      username: this.user,
-      userId: this.userId
-    });
-  }
 }
 
 const styles = StyleSheet.create({
@@ -182,7 +167,7 @@ const styles = StyleSheet.create({
   },
   enabledNext: {
     color: '#FA8428',
-    fontSize: 50,
+    fontSize: 70,
     marginTop: 10
   },
   disabledNext: {

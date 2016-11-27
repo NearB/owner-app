@@ -5,20 +5,17 @@ import {
   View,
   Image,
   TouchableOpacity,
-  ToolbarAndroid,
   Navigator,
   ListView
 } from 'react-native';
 
-import {MKTextField, MKButton} from 'react-native-material-kit';
 import _s from 'underscore.string';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
 import ActionButton from 'react-native-action-button';
 
 import MobileClient from '../../utils/MobileClient';
 const service = new MobileClient();
-
+import NavLeft from '../common/NavigatorLeft';
 const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 
 var _navigator;
@@ -29,7 +26,18 @@ export default class UserHome extends Component {
     super(props);
 
     this.username = props.username;
-    this.ownerId= props.userId;
+    this.userId= props.userId;
+
+
+        if (this.username == null || this.userId == null){
+          throw new Error("LA CONCHA DE TU REPUTA MADRE");
+        }
+
+    console.log({
+      username: this.username,
+      userId: this.userId
+    });
+
     this.state = {
       stores: ds.cloneWithRows([])
     };
@@ -59,7 +67,6 @@ export default class UserHome extends Component {
   }
 
   _selectStore(store){
-    console.log(store);
     this._next(false, store);
   }
 
@@ -84,7 +91,12 @@ export default class UserHome extends Component {
                 <View style={styles.apInfo}>
                   <Image style={{width: 50, height: 50}}
                     source={{uri: 'https://facebook.github.io/react/img/logo_og.png'}}/>
-                  <Text style={{marginLeft:15, fontSize: 15, fontWeight: 'bold'}}>{_s.humanize(rowData.name)}</Text>
+                  <Text style={{marginLeft:15, fontSize: 15, fontWeight: 'bold'}}>
+                    {_s.humanize(rowData.name)}:
+                  </Text>
+                    {rowData.locations.length > 0
+                      ? <Text style={{fontSize: 15, fontWeight: 'bold'}}> {rowData.locations.length} Locations</Text>
+                      : <Text style={{fontSize: 15, fontWeight: 'bold'}}>No locations</Text>}
                 </View>
               </TouchableOpacity>
             );
@@ -101,6 +113,29 @@ export default class UserHome extends Component {
     );
   }
 
+  _next(addingStore, selected) {
+    let route = {};
+    if (addingStore){
+      route = {
+        id: 'AddStore',
+        name: 'AddStore',
+        userId: this.userId,
+        username: this.username
+      };
+    } else if (selected != null){
+      route = {
+        id: 'StoreDetails',
+        name: 'StoreDetails',
+        store: selected,
+        username: this.username,
+        userId: this.userId
+      };
+    }
+
+    console.log(route);
+    this.props.navigator.push(route);
+  }
+
   render() {
     return (
       <Navigator
@@ -110,21 +145,7 @@ export default class UserHome extends Component {
             routeMapper={{
               LeftButton: (route, navigator, index, navState) =>
               { return (
-                <View>
-                  <TouchableOpacity
-                    onPress={()=>{ this.props.navigator.pop();}}>
-                    <Icon name="arrow-left"
-                      style={{
-                        fontSize: 30,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        color:'#FFFFFF',
-                        marginTop: 12,
-                        marginLeft: 12
-                      }}
-                      allowFontScaling={true}/>
-                  </TouchableOpacity>
-                </View>
+                  <NavLeft onPress={()=>{ this.props.navigator.pop();}}/>
                 );
               },
               RightButton: (route, navigator, index, navState) =>
@@ -144,25 +165,6 @@ export default class UserHome extends Component {
     );
   }
 
-  _next(addingStore, selected) {
-    if (addingStore){
-      console.log("ADDING STORE");
-      this.props.navigator.push({
-        id: 'AddStore',
-        name: 'AddStore',
-        ownerId: this.ownerId
-      });
-    } else if (selected != null){
-      console.log("STORE DETAILS");
-      this.props.navigator.push({
-        id: 'StoreDetails',
-        name: 'StoreDetails',
-        store: selected,
-        ownerId: this.ownerId,
-        username: this.username
-      });
-    }
-  }
 }
 
 const styles = StyleSheet.create({

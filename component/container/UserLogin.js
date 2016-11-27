@@ -11,7 +11,7 @@ import {
 import {MKTextField} from 'react-native-material-kit';
 import _s from 'underscore.string';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import NavLeft from '../common/NavigatorLeft';
 import MobileClient from '../../utils/MobileClient';
 const service = new MobileClient();
 
@@ -32,6 +32,7 @@ export default class UserLogin extends Component {
     this.handleUserUpdate = this.handleUserUpdate.bind(this);
     this.handlePasswordUpdate = this.handlePasswordUpdate.bind(this);
     this._toogleSubmit = this._toogleSubmit.bind(this);
+    this._next = this._next.bind(this);
   }
 
   handleUserUpdate(user) {
@@ -52,6 +53,7 @@ export default class UserLogin extends Component {
   }
 
   handleSubmit() {
+    console.log(this.user);
     service.users('GET', this.user)
     .then(res => {
       if (res.data != null) {
@@ -113,6 +115,20 @@ export default class UserLogin extends Component {
     );
   }
 
+  _next() {
+    if (!this.state.disableSubmit) {
+      const route = {
+        id: 'UserHome',
+        name: 'UserHome',
+        username: this.user,
+        userId: this.userId
+      };
+
+      console.log(route);
+      this.props.navigator.push(route);
+    }
+  }
+
   render() {
     return (
       <Navigator
@@ -139,20 +155,6 @@ export default class UserLogin extends Component {
     );
   }
 
-  _next() {
-    if (!this.state.disableSubmit) {
-      this.gotoNext();
-    }
-  }
-
-  gotoNext() {
-    this.props.navigator.push({
-      id: 'UserHome',
-      name: 'UserHome',
-      username: this.user,
-      userId: this.userId
-    });
-  }
 }
 
 const styles = StyleSheet.create({

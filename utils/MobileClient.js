@@ -11,9 +11,8 @@ export default class MobileClient {
 
   constructor(){
     //FIXME find a better way to handle this instead of hardcoded the IP of our docker server
-    this.IP = '192.168.0.103';
+    this.IP = '192.168.0.102';
     this.PORT = '10000';
-    this.baseUrl = `http://${this.IP}:${this.PORT}/api/`;
 
     this.locations.bind(this);
     this.locate.bind(this);
@@ -42,9 +41,20 @@ export default class MobileClient {
     return this._fetch(method, `${resource}${relative}`, config);
   }
 
-  _fetch(method, relative, userConfig){
+  ads(method, relative = '', config = {}){
+    const resource = 'marketing/ads/';
+    return this._fetch(method, `${resource}${relative}`, config);
+  }
 
-    const url = `${this.baseUrl}${relative}`;
+  ads(method, relative = '', config = {}){
+    const resource = 'marketing/campaigns/';
+    return this._fetch(method, `${resource}${relative}`, config);
+  }
+
+  _fetch(method, relative, userConfig){
+    const url = `http://${this.IP}:${this.PORT}/api/${relative}`;
+
+    console.log(url);
     const config = Object.assign({},
        userConfig,
       { method: method },
@@ -54,8 +64,7 @@ export default class MobileClient {
     console.log(`Fetching ${url}`);
     console.log('Config: ', config);
 
-    return fetch(url, config)
-            .then(r => r.json());
+    return fetch(url, config).then(r => r.json());
   }
 }
 

@@ -12,17 +12,25 @@ import {MKTextField}from 'react-native-material-kit';
 import _s from 'underscore.string';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import Icon from 'react-native-vector-icons/FontAwesome';
-
-var _navigator;
+import NavLeft from '../common/NavigatorLeft';
 
 export default class AddLocation extends Component {
 
   constructor(props) {
     super(props);
 
-    this.storeName = props.storeName;
     this.username = props.username;
+    this.store = props.store;
+
+    if (this.username == null || this.store == null){
+      throw new Error("LA CONCHA DE TU REPUTA MADRE");
+    }
+
+    console.log("username: " + this.username);
+    console.log(this.store);
+
     this.locationName = '';
+
     this.state = {
       disableSubmit: true,
       iconStyle: styles.enabledNext
@@ -30,7 +38,6 @@ export default class AddLocation extends Component {
     this._updateLocation = this._updateLocation.bind(this);
     this._toogleSubmit = this._toogleSubmit.bind(this);
     this._next = this._next.bind(this);
-    this.gotoNext = this.gotoNext.bind(this);
   }
 
   _updateLocation(location) {
@@ -46,8 +53,6 @@ export default class AddLocation extends Component {
   }
 
   renderScene(route, navigator) {
-    _navigator = navigator;
-
     return (
       <View style={styles.container}>
         <View style={{flex: 1, flexDirection: 'column',   alignItems: 'center',
@@ -70,6 +75,21 @@ export default class AddLocation extends Component {
     );
   }
 
+  _next() {
+    if (!this.state.disableSubmit) {
+      const route = {
+        id: 'RegistrationDetail',
+        name: 'RegistrationDetail',
+        location: this.locationName,
+        store: this.store,
+        username: this.username,
+      };
+
+      console.log(route);
+      this.props.navigator.push(route);
+    }
+  }
+
   render() {
     return (
       <Navigator
@@ -79,21 +99,7 @@ export default class AddLocation extends Component {
             routeMapper={{
               LeftButton: (route, navigator, index, navState) =>
               { return (
-                <View>
-                  <TouchableOpacity
-                    onPress={()=>{ this.props.navigator.pop();}}>
-                    <Icon name="arrow-left"
-                      style={{
-                        fontSize: 30,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        color:'#FFFFFF',
-                        marginTop: 12,
-                        marginLeft: 12
-                      }}
-                      allowFontScaling={true}/>
-                  </TouchableOpacity>
-                </View>
+                  <NavLeft onPress={()=>{ this.props.navigator.pop();}}/>
                 );
               },
               RightButton: (route, navigator, index, navState) =>
@@ -106,22 +112,6 @@ export default class AddLocation extends Component {
         }
       />
     );
-  }
-
-  _next() {
-    if (!this.state.disableSubmit) {
-      this.gotoNext();
-    }
-  }
-
-  gotoNext() {
-    this.props.navigator.push({
-      id: 'RegistrationDetail',
-      name: 'RegistrationDetail',
-      location: this.locationName,
-      storeName: this.storeName,
-      username: this.username
-    });
   }
 }
 
@@ -149,7 +139,7 @@ const styles = StyleSheet.create({
   },
   enabledNext: {
     color: '#FA8428',
-    fontSize: 50,
+    fontSize: 70,
     marginTop: 10
   },
   disabledNext: {

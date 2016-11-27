@@ -52,12 +52,6 @@ class App extends Component {
     var routeId = route.id;
     _navigator = navigator;
 
-    if (routeId === 'HomeView') {
-      return (
-        <HomeView
-          navigator={navigator}/>
-      );
-    }
     if (routeId === 'UserLogin') {
       return (
         <UserLogin
@@ -77,7 +71,6 @@ class App extends Component {
         <StoreDetails
           navigator={navigator}
           store={route.store}
-          ownerId = {route.ownerId}
           username = {route.username}
           />
       );
@@ -86,7 +79,7 @@ class App extends Component {
       return (
         <AddStore
           navigator={navigator}
-          user={route.user}
+          username={route.username}
           userId={route.userId} />
       );
     }
@@ -94,8 +87,8 @@ class App extends Component {
       return (
         <AddLocation
           navigator={navigator}
-          storeName={route.storeName}
-          username={route.username}/>
+          username={route.username}
+          store={route.store}/>
       );
     }
     if (routeId === 'RegistrationDetail') {
@@ -103,7 +96,8 @@ class App extends Component {
         <RegistrationDetail
           navigator={navigator}
           location={route.location}
-          username= {route.username} />
+          username= {route.username}
+          store={route.store}/>
       );
     }
     return this.noRoute(navigator);

@@ -4,6 +4,7 @@ import {
   Text,
   View,
   Image,
+  Alert,
   TouchableOpacity,
   ToolbarAndroid,
   Navigator,
@@ -15,13 +16,11 @@ import _s from 'underscore.string';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {Button} from 'react-native-material-design';
 import ActionButton from 'react-native-action-button';
-
+import NavLeft from '../common/NavigatorLeft';
 import MobileClient from '../../utils/MobileClient';
 const service = new MobileClient();
 
 const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-
-var _navigator;
 
 export default class StoreDetails extends Component {
 
@@ -29,8 +28,14 @@ export default class StoreDetails extends Component {
     super(props);
 
     this.username = props.username;
-    this.ownerId = props.ownerId;
     this.store = props.store;
+
+    if (this.username == null || this.store == null){
+      throw new Error("LA CONCHA DE TU REPUTA MADRE");
+    }
+
+    console.log(this.store);
+    console.log({username: this.username});
 
     this.state = {
       locations: ds.cloneWithRows(this.store.locations),
@@ -39,7 +44,6 @@ export default class StoreDetails extends Component {
 
     this._selectLocation = this._selectLocation.bind(this);
     this._addLocation = this._addLocation.bind(this);
-    this._editStore = this._editStore.bind(this);
   }
 
   _selectLocation(loc){
@@ -52,21 +56,14 @@ export default class StoreDetails extends Component {
     this._next();
   }
 
-  _editStore(){
-    this.setState({addingLocation: true});
-    this._next();
-  }
-
   renderScene(route, navigator) {
-    _navigator = navigator;
-
     return (
       <View style={styles.container}>
         <Text style={{marginTop:40}}>SPACER</Text>
         <View style={styles.apInfo}>
           <Icon name="user" size={20} style={{marginBottom: 10, marginRight: 10}}/>
           <Text style={{fontSize: 15, fontWeight: 'bold', marginBottom: 10}}> Owner: </Text>
-          <Text style={styles.data}>{this.ownerId}</Text>
+          <Text style={styles.data}>{this.username}</Text>
         </View>
         <View style={styles.apInfo}>
           <Icon name="home" size={20} style={{marginBottom: 10, marginRight: 10}}/>
@@ -94,14 +91,27 @@ export default class StoreDetails extends Component {
                 onPress={this._addLocation}>
               <Icon name="map-marker" style={styles.actionButtonIcon} />
             </ActionButton.Item>
-            <ActionButton.Item titleBgColor='#F5FCFF' buttonColor='#3498db'
-              textStyle={{fontSize: 15, fontWeight: 'bold'}}
-              onPress={this._editStore}>
-              <Icon name="pencil" style={styles.actionButtonIcon} />
-            </ActionButton.Item>
+            {/*
+              <ActionButton.Item titleBgColor='#F5FCFF' buttonColor='#3498db'
+                textStyle={{fontSize: 15, fontWeight: 'bold'}}
+                onPress={this._deleteStore}>
+                <Icon name="trash-o" style={styles.actionButtonIcon} />
+              </ActionButton.Item>
+            */}
           </ActionButton>
       </View>
     );
+  }
+
+  _next() {
+    const route = {
+      id: 'AddLocation',
+      name: 'AddLocation',
+      username: this.username,
+      store: this.store
+    };
+    console.log(route);
+    this.props.navigator.push(route);
   }
 
   render() {
@@ -113,21 +123,7 @@ export default class StoreDetails extends Component {
             routeMapper={{
               LeftButton: (route, navigator, index, navState) =>
               { return (
-                <View>
-                  <TouchableOpacity
-                    onPress={()=>{ this.props.navigator.pop();}}>
-                    <Icon name="arrow-left"
-                      style={{
-                        fontSize: 30,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        color:'#FFFFFF',
-                        marginTop: 12,
-                        marginLeft: 12
-                      }}
-                      allowFontScaling={true}/>
-                  </TouchableOpacity>
-                </View>
+                  <NavLeft onPress={()=>{ this.props.navigator.pop();}}/>
                 );
               },
               RightButton: (route, navigator, index, navState) =>
@@ -145,31 +141,6 @@ export default class StoreDetails extends Component {
         }
         />
     );
-  }
-
-  _next() {
-    if (this.state.addingLocation){
-      this.gotoNext();
-    }
-  }
-
-  gotoNext() {
-    if (this.state.addingLocation){
-      this.props.navigator.push({
-        id: 'AddLocation',
-        name: 'AddLocation',
-        username: this.username,
-        storeName: this.store.name
-      });
-    } else {
-      //TODO Edit store
-
-      // this.props.navigator.push({
-      //   id: 'AddStore',
-      //   name: 'AddStore',
-      //   ownerId: this.ownerId
-      // });
-    }
   }
 }
 

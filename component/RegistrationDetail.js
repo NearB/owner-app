@@ -16,6 +16,11 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import WifiLearning from './WifiLearning';
 import WifiTrack from './WifiTrack';
 import WifiClient from '../utils/WifiClient';
+import NavLeft from './common/NavigatorLeft';
+import MobileClient from '../utils/MobileClient';
+import _s from 'underscore.string';
+
+const service = new MobileClient();
 
 const STORES_GROUP = 'Stores';
 
@@ -26,10 +31,23 @@ export default class RegistrationDetail extends Component {
   constructor(props) {
     super(props);
     this.username = props.username;
-    this.storeName = props.storeName;
+    this.store = props.store;
     this.location = props.location;
 
-    this.wifi = new WifiClient(STORES_GROUP, `${this.username}:${this.storeName}`);
+    if (this.username == null || this.store == null || this.location == null){
+      throw new Error("LA CONCHA DE TU REPUTA MADRE");
+    }
+
+    console.log(this.store);
+    console.log({
+      username: this.username,
+      location: this.location,
+    });
+
+    this.findUsername = _s.camelize(_s.clean(`${this.username}:${this.store.name}`).replace(/\s/g, "-"));
+    this.findLocation = _s.camelize(_s.clean(`${this.store.name}:${this.location}`).replace(/\s/g, "-"));
+
+    this.wifi = new WifiClient(STORES_GROUP, this.findUsername);
 
     this.state = {
       track: null,
@@ -39,6 +57,8 @@ export default class RegistrationDetail extends Component {
     };
     this.renderLearning.bind(this);
     this.renderInfo.bind(this);
+    this.goToHome.bind(this);
+    this.gotoNext.bind(this);
   }
 
   componentDidMount() {
@@ -57,16 +77,28 @@ export default class RegistrationDetail extends Component {
   }
 
   done(locationInfo) {
-
-    console.log(locationInfo.toJSON());
-
     const qparams = encodeURI(locationInfo.fingerprints().join(','));
-    const user = encodeURI(`${this.username}:${this.storeName}`);
-    console.log(qparams);
+    const user = encodeURI(`${this.username}:${this.store.name}`);
 
-    service.locate('GET', `?beacons=${qparams}&username=${user}`, {})
+
+    service.locate('GET', `?beacons=${qparams}&username=${user}&group=Stores`, {})
     .then(res => {
       console.log(res.data);
+
+      const newStore = Object.assign({}, this.store, {locations: this.store.locations.concat(locationInfo.location)})
+      service.stores('PUT', this.store._id, {
+        body: JSON.stringify(newStore)
+      })
+      .then(res => {
+        console.log("RESPONSE");
+        console.log(res.data);
+        this.store = res.data;
+        this.goToHome();
+      })
+      .catch(err => {
+        console.log("ERROR");
+        console.log(err);
+      });
     }).catch((error) => {
       console.log(error);
     });
@@ -94,6 +126,8 @@ export default class RegistrationDetail extends Component {
     });
   }
 
+  // ========== Render ==========
+
   renderScene(route, navigator) {
     _navigator = navigator;
 
@@ -118,13 +152,12 @@ export default class RegistrationDetail extends Component {
     )
   }
 
-
   renderLearning() {
     return (
       <WifiLearning onCancel={this.cancelLearn.bind(this)}
                     onDone={this.done.bind(this)}
-                    location={this.location}
-                    username={this.username}/>
+                    location={this.findLocation}
+                    username={this.findUsername}/>
     );
   }
 
@@ -134,8 +167,8 @@ export default class RegistrationDetail extends Component {
     return (
       <WifiTrack onCancel={this.cancelTracking.bind(this)}
                     onDone={this.doneTracking.bind(this)}
-                    location={this.location}
-                    username={this.username}/>
+                    location={this.findLocation}
+                    username={this.findUsername}/>
     );
   }
 
@@ -154,6 +187,22 @@ export default class RegistrationDetail extends Component {
     );
   }
 
+  goToHome() {
+    this.props.navigator.resetTo({
+      id: 'UserHome',
+      name: 'UserHome',
+      username: this.username,
+      userId: this.store.ownerId
+    });
+  }
+
+  gotoNext() {
+    this.props.navigator.push({
+      id: 'NoNavigatorPage',
+      sceneConfig: Navigator.SceneConfigs.FloatFromBottom
+    });
+  }
+
   render() {
     return (
       <Navigator
@@ -164,21 +213,7 @@ export default class RegistrationDetail extends Component {
             routeMapper={{
               LeftButton: (route, navigator, index, navState) =>
               { return (
-                <View>
-                  <TouchableOpacity
-                    onPress={()=>{ this.props.navigator.pop();}}>
-                    <Icon name="arrow-left"
-                      style={{
-                        fontSize: 30,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        color:'#FFFFFF',
-                        marginTop: 12,
-                        marginLeft: 12
-                      }}
-                      allowFontScaling={true}/>
-                  </TouchableOpacity>
-                </View>
+                  <NavLeft onPress={()=>{ this.props.navigator.pop();}}/>
                 );
               },
               RightButton: (route, navigator, index, navState) => {
@@ -192,14 +227,6 @@ export default class RegistrationDetail extends Component {
           />
         }/>
     );
-  }
-
-
-  gotoNext() {
-    this.props.navigator.push({
-      id: 'NoNavigatorPage',
-      sceneConfig: Navigator.SceneConfigs.FloatFromBottom
-    });
   }
 }
 

@@ -10,17 +10,21 @@ import WifiClient from '../utils/WifiClient';
 import MobileClient from '../utils/MobileClient';
 const service = new MobileClient();
 
-const STORES_GROUP = 'Stores';
 
 export default class WifiLearning extends Component {
 
   constructor(props) {
     super(props);
 
-    this.username = `${props.username}:${props.storeName}`;
-    this.locationName = `${props.storeName}:${props.location}`;
+    if (props.username == null || props.location == null){
+      throw new Error("LA CONCHA DE TU REPUTA MADRE");
+    }
 
-    this.wifi = new WifiClient(STORES_GROUP, );
+    this.username = props.username;
+    this.locationName = props.location;
+
+
+    this.wifi = new WifiClient('Stores', this.username);
     this.numberOfScans = 0;
     this.maxScans = 10;
     this.scanJob = null;
@@ -49,7 +53,8 @@ export default class WifiLearning extends Component {
   done() {
     console.log("DONE");
     this._stopScanJob();
-    this.state.onDone(this.locationInfo);
+    console.log(this.state.locationInfo);
+    this.state.onDone(this.state.locationInfo);
   }
 
   _stopScanJob() {
