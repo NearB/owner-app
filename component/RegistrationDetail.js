@@ -22,10 +22,6 @@ import _s from 'underscore.string';
 
 const service = new MobileClient();
 
-const STORES_GROUP = 'Stores';
-
-var _navigator;
-
 export default class RegistrationDetail extends Component {
 
   constructor(props) {
@@ -47,7 +43,7 @@ export default class RegistrationDetail extends Component {
     this.findUsername = _s.camelize(_s.clean(`${this.username}:${this.store.name}`).replace(/\s/g, "-"));
     this.findLocation = _s.camelize(_s.clean(`${this.store.name}:${this.location}`).replace(/\s/g, "-"));
 
-    this.wifi = new WifiClient(STORES_GROUP, this.findUsername);
+    this.wifi = new WifiClient('Stores', this.findUsername);
 
     this.state = {
       track: null,
@@ -78,8 +74,7 @@ export default class RegistrationDetail extends Component {
 
   done(locationInfo) {
     const qparams = encodeURI(locationInfo.fingerprints().join(','));
-    const user = encodeURI(`${this.username}:${this.store.name}`);
-
+    const user = encodeURI(`${this.findUsername}`);
 
     service.locate('GET', `?beacons=${qparams}&username=${user}&group=Stores`, {})
     .then(res => {
@@ -129,8 +124,6 @@ export default class RegistrationDetail extends Component {
   // ========== Render ==========
 
   renderScene(route, navigator) {
-    _navigator = navigator;
-
     return (
       <View style={styles.container}>
         { this.state.learning || this.state.tracking
