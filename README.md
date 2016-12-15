@@ -6,6 +6,7 @@
 - [Node.js](https://nodejs.org/en/download/)
 - [ADB](https://developer.android.com/studio/command-line/adb.html)
 - [Android Studio, SDK, NDK and SDK Manager] (https://developer.android.com/studio/index.html)
+- [Authentication Setup](https://auth0.com/docs/quickstart/native/react-native-android)
 
 ## First time setup
 

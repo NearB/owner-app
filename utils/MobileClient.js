@@ -41,6 +41,11 @@ export default class MobileClient {
     return this._fetch(method, `${resource}${relative}`, config);
   }
 
+  login(method, relative = '', config = {}){
+    const resource = 'login/';
+    return this._fetch(method, `${resource}${relative}`, config);
+  }
+
   users(method, relative = '', config = {}){
     const resource = 'users/';
     return this._fetch(method, `${resource}${relative}`, config);

@@ -1,4 +1,4 @@
-package com.fiuba.nearb;
+package com.fiuba.nearb.owner;
 
 import java.util.Arrays;
 import java.util.Collections;

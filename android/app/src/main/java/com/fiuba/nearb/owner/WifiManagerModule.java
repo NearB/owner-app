@@ -1,4 +1,4 @@
-package com.fiuba.nearb;
+package com.fiuba.nearb.owner;
 
 import com.facebook.react.uimanager.*;
 import com.facebook.react.bridge.*;

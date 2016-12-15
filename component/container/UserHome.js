@@ -10,15 +10,13 @@ import {
 } from 'react-native';
 
 import _s from 'underscore.string';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import ActionButton from 'react-native-action-button';
 
+import NavLeft from '../common/NavigatorLeft';
 import MobileClient from '../../utils/MobileClient';
 const service = new MobileClient();
-import NavLeft from '../common/NavigatorLeft';
-const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 
-var _navigator;
+const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 
 export default class UserHome extends Component {
 
@@ -75,9 +73,6 @@ export default class UserHome extends Component {
   }
 
   renderScene(route, navigator) {
-
-    _navigator = navigator;
-
     return (
       <View style={styles.container}>
         <Text style={{marginTop:40}}>SPACER</Text>
