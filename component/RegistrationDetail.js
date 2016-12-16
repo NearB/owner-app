@@ -30,10 +30,6 @@ export default class RegistrationDetail extends Component {
     this.store = props.store;
     this.location = props.location;
 
-    if (this.username == null || this.store == null || this.location == null){
-      throw new Error("LA CONCHA DE TU REPUTA MADRE");
-    }
-
     console.log(this.store);
     console.log({
       username: this.username,
@@ -41,8 +37,9 @@ export default class RegistrationDetail extends Component {
     });
 
     this.findUsername = _s.camelize(_s.clean(`${this.username}:${this.store.name}`).replace(/\s/g, "-"));
-    this.findLocation = _s.camelize(_s.clean(`${this.store.name}:${this.location}`).replace(/\s/g, "-"));
+    this.findLocation = _s.camelize(_s.clean(`${this.store.name}:${this.location}`).replace(/\s/g, "-")).toLowerCase();
 
+    console.log("FIND LOCATION " + this.findLocation);
     this.wifi = new WifiClient('Stores', this.findUsername);
 
     this.state = {
@@ -80,18 +77,19 @@ export default class RegistrationDetail extends Component {
     .then(res => {
       console.log(res.data);
 
-      const newStore = Object.assign({}, this.store, {locations: this.store.locations.concat(locationInfo.location)})
+      let newLocations = this.store.locations.concat(locationInfo.location).map(loc => loc.toLowerCase());
+      const newStore = Object.assign({}, this.store, {locations: newLocations});
+
+      console.log(newStore);
+
       service.stores('PUT', this.store._id, {
         body: JSON.stringify(newStore)
       })
       .then(res => {
-        console.log("RESPONSE");
-        console.log(res.data);
         this.store = res.data;
         this.goToHome();
       })
       .catch(err => {
-        console.log("ERROR");
         console.log(err);
       });
     }).catch((error) => {

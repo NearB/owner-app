@@ -26,11 +26,6 @@ export default class UserHome extends Component {
     this.username = props.username;
     this.userId= props.userId;
 
-
-        if (this.username == null || this.userId == null){
-          throw new Error("LA CONCHA DE TU REPUTA MADRE");
-        }
-
     console.log({
       username: this.username,
       userId: this.userId
@@ -51,10 +46,9 @@ export default class UserHome extends Component {
   }
 
   _fetchStores() {
-    service.stores('GET', '')
+    service.stores('GET', `?ownerId=${this.userId}`)
     .then((res) => {
       const data = res.data;
-      console.log(data);
       this.setState({
         stores: ds.cloneWithRows(data)
       });

@@ -22,13 +22,6 @@ export default class AddLocation extends Component {
     this.username = props.username;
     this.store = props.store;
 
-    if (this.username == null || this.store == null){
-      throw new Error("LA CONCHA DE TU REPUTA MADRE");
-    }
-
-    console.log("username: " + this.username);
-    console.log(this.store);
-
     this.locationName = '';
 
     this.state = {
@@ -41,7 +34,7 @@ export default class AddLocation extends Component {
   }
 
   _updateLocation(location) {
-    this.locationName = location;
+    this.locationName = location.toLowerCase();
     this._toogleSubmit()
   }
 
